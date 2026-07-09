@@ -1,3 +1,4 @@
+
 from matrix import Vector4
 
 
@@ -38,14 +39,14 @@ class Mesh:
         size: float = 1.0,
     ) -> "Mesh":
         return Mesh([
-            Vector4(-size,-size,-size),
-            Vector4(size,-size,-size),
-            Vector4(size,-size,size),
-            Vector4(-size,-size,size),
-            Vector4(0,size,0),
+            Vector4(-size, -size, -size),
+            Vector4(size, -size, -size),
+            Vector4(size, -size, size),
+            Vector4(-size, -size, size),
+            Vector4(0, size, 0),
         ],
-        [    
-        (0, 1, 2), (0, 2, 3),
-        (0, 1, 4), (1, 2, 4),
-        (2, 3, 4), (3, 0, 4)
+        [
+            (0, 1, 2), (0, 2, 3),
+            (0, 1, 4), (1, 2, 4),
+            (2, 3, 4), (3, 0, 4)
         ])

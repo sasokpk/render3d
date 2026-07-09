@@ -1,3 +1,4 @@
+
 from mesh import Mesh
 from matrix import Matrix4, Vector3, Vector4
 from camera import Camera
@@ -104,6 +105,7 @@ class Renderer:
         return round(screen_x), round(screen_y)
 
     def present(self) -> None:
-        os.system("clear")
+        command = "cls" if os.name == "nt" else "clear"
+        os.system(command)
         for row in self.screen:
             print(''.join(row))

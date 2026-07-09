@@ -22,6 +22,7 @@ camera = Camera(
 mesh = Mesh.cube()
 
 angle = 0.0
+last_time = time.time()
 
 while True:
     renderer.clear()
@@ -47,5 +48,10 @@ while True:
 
     renderer.present()
 
-    angle += 0.02
-    time.sleep(0.016) 
+    current_time = time.time()
+    elapsed = current_time - last_time
+    if elapsed < 0.016:
+        time.sleep(0.016 - elapsed)
+    last_time = time.time()
+    
+    angle += 0.02 

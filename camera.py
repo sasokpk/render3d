@@ -1,4 +1,10 @@
-from matrix import Matrix4, Vector3
+from __future__ import annotations
+from typing import Optional
+
+try:
+    from .matrix import Matrix4, Vector3
+except ImportError:
+    from matrix import Matrix4, Vector3
 
 
 class Camera:
