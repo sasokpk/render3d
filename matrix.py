@@ -1,41 +1,176 @@
-from math import cos, sin, tan
+from math import cos, sin, tan, isclose
 
 
 class Vector3:
-    def __init__(self, x: float, y: float, z: float):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z: float,
+    ) -> None:
         self.x = x
         self.y = y
         self.z = z
 
-    def __getitem__(self, i):
+    def length_squared(self) -> float:
+        return self.x**2 + self.y**2 + self.z**2
+
+    def __getitem__(
+        self,
+        i: int,
+    ) -> float:
         return (self.x, self.y, self.z)[i]
 
-    def __iter__(self):
-        yield self.x
-        yield self.y
-        yield self.z
+    def __iter__(
+        self,
+    ):
+        yield from (self.x, self.y, self.z)
+
+    def __add__(
+        self,
+        other: "Vector3",
+    ) -> "Vector3":
+        return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def copy(self):
+        return Vector3(self.x, self.y, self.z)
+
+    def __sub__(
+        self,
+        other: "Vector3",
+    ) -> "Vector3":
+        return Vector3(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __mul__(
+        self,
+        scalar: float,
+    ) -> "Vector3":
+        return Vector3(self.x * scalar, self.y * scalar, self.z * scalar)
+
+    def __truediv__(
+        self,
+        scalar: float,
+    ) -> "Vector3":
+        if scalar == 0:
+            raise ZeroDivisionError("Cannot divide by zero")
+        return Vector3(self.x / scalar, self.y / scalar, self.z / scalar)
+
+    def __neg__(
+        self,
+    ) -> "Vector3":
+        return Vector3(-self.x, -self.y, -self.z)
+
+    def dot(
+        self,
+        other: "Vector3",
+    ) -> float:
+        return self.x * other.x + self.y * other.y + self.z * other.z
+
+    def cross(
+        self,
+        other: "Vector3",
+    ) -> "Vector3":
+        return Vector3(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x
+        )
+
+    def length(
+        self,
+    ) -> float:
+        return (self.x**2 + self.y**2 + self.z**2) ** 0.5
+    def __eq__(
+        self,
+        other: object,
+    ) -> bool:
+        if not isinstance(other, Vector3):
+            return False
+        return (isclose(self.x, other.x) and isclose(self.y, other.y) and isclose(self.z, other.z))
+
+    def normalize(
+        self,
+    ) -> None:
+        length = self.length()
+        if length == 0:
+            raise ValueError("Cannot normalize a zero vector")
+        self.x /= length
+        self.y /= length
+        self.z /= length
+
+    def normalized(
+        self,
+    ) -> "Vector3":
+        length = self.length()
+        if length == 0:
+            raise ValueError("Cannot normalize a zero vector")
+        return Vector3(self.x / length, self.y / length, self.z / length)
+
+    def to_vector4(
+        self,
+        w: float = 1.0,
+    ) -> "Vector4":
+        return Vector4(self.x, self.y, self.z, w)
+
+    def __repr__(
+        self,
+    ) -> str:
+        return f"Vector3({self.x}, {self.y}, {self.z})"
 
 class Vector4:
-    def __init__(self, x: float, y: float, z: float, w: float = 1.0):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z: float,
+        w: float = 1.0,
+    ) -> None:
         self.x = x
         self.y = y
         self.z = z
         self.w = w
 
-    def perspective_divide(self):
+    def perspective_divide(
+        self,
+    ) -> "Vector4":
         if self.w == 0:
-            raise ZeroDivisionError()
-
+            raise ZeroDivisionError("Cannot perform perspective divide with w=0")
         return Vector4(self.x / self.w, self.y / self.w, self.z / self.w, 1.0)
 
-    def __getitem__(self, i):
+    def xyz(
+        self,
+    ) -> Vector3:
+        return Vector3(self.x, self.y, self.z)
+
+    def __getitem__(
+        self,
+        i: int,
+    ) -> float:
         return (self.x, self.y, self.z, self.w)[i]
 
-    def __iter__(self):
-        yield self.x
-        yield self.y
-        yield self.z
-        yield self.w
+    def __iter__(
+        self,
+    ):
+        yield from (self.x, self.y, self.z, self.w)
+    
+    def copy(self):
+        return Vector4(self.x, self.y, self.z, self.w)
+
+    def __eq__(
+        self,
+        other: object,
+    ) -> bool:
+        if not isinstance(other, Vector4):
+            return False
+        return (isclose(self.x, other.x) and isclose(self.y, other.y) and isclose(self.z, other.z) and isclose(self.w, other.w))
+
+    def __sub__(self, other: Vector4):
+        return Vector4(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
+
+    def __repr__(
+        self,
+    ) -> str:
+        return f"Vector4({self.x}, {self.y}, {self.z}, {self.w})"
 
 
 class Matrix4:

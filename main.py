@@ -26,16 +26,17 @@ angle = 0.0
 while True:
     renderer.clear()
 
-    scale = 1.3 + 0.4 * math.sin(angle * 2)
+    scale = 3
     x = 2.0 * math.sin(angle)
     y = 1.0 * math.sin(angle * 0.7)
 
     model = (
         Matrix4.translation(x, y, 0.0)
-        @ Matrix4.rotation_z(angle * 0.2)
+        @ Matrix4.rotation_z(angle)
         @ Matrix4.rotation_y(angle)
-        @ Matrix4.rotation_x(angle * 0.5)
-        @ Matrix4.scale(scale, scale, scale)
+        @ Matrix4.rotation_x(angle)
+        @ Matrix4.uniform_scale(scale)
+
     )
 
     renderer.draw(
