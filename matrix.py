@@ -276,6 +276,9 @@ class Matrix4:
 
     def transpose(self) -> "Matrix4":
         return Matrix4([[self.matrix[j][i] for j in range(4)] for i in range(4)])
+    
+    def to_vector3(self) -> "Vector3":
+        return Vector3(self.x, self.y, self.z)
 
     def inverse(self) -> "Matrix4":
         """
@@ -442,3 +445,5 @@ class Matrix4:
                     for k in range(4):
                         C[i][j] += self.matrix[i][k] * other.matrix[k][j]
             return Matrix4(C)
+        elif isinstance(other, Vector3):
+            return self @ other.to_vector4()

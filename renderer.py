@@ -18,48 +18,54 @@ class Renderer:
         self.screen = [[' '] * self.width for _ in range(self.height)]
 
     def draw(
-        self,
-        mesh: Mesh,
-        model: Matrix4,
-        camera: Camera,
-    ) -> None:
-        try:
-            view = camera.get_view_matrix()
-            projection = camera.get_projection_matrix()
-            projected_vertices = []
-            view_vertices = []
-            for vertex in mesh.vertices:
-                world4 = model @ vertex
-                view4 = view @ world4
-                view_vertices.append(Vector3(view4.x, view4.y, view4.z))
-                clip = projection @ view4
-                ndc = clip.perspective_divide()
-                projected_vertices.append(self.to_screen(ndc))
-            for face in mesh.faces:
-                try:
-                    A = view_vertices[face[0]]
-                    B = view_vertices[face[1]]
-                    C = view_vertices[face[2]]
-                except Exception:
-                    print(f"Error accessing face indices: {face}")
-                    return
-                AB = B - A
-                AC = C - A
-                normal = Vector3(
-                    AB.y * AC.z - AB.z * AC.y,
-                    AB.z * AC.x - AB.x * AC.z,
-                    AB.x * AC.y - AB.y * AC.x,
-                )
-                normal.normalize()
-                x1, y1 = projected_vertices[face[0]]
-                x2, y2 = projected_vertices[face[1]]
-                x3, y3 = projected_vertices[face[2]]
-                self.draw_line(x1, y1, x2, y2)
-                self.draw_line(x2, y2, x3, y3)
-                self.draw_line(x3, y3, x1, y1)
-        except Exception:
-            print("Exception in Renderer.draw")
-            return
+    self,
+    mesh: Mesh,
+    model: Matrix4,
+    camera: Camera,
+) -> None:
+        view = camera.get_view_matrix()
+        projection = camera.get_projection_matrix()
+
+        mvp = projection @ view @ model
+
+        world_vertices: list[Vector3] = []
+        projected_vertices: list[tuple[int, int]] = []
+
+        # Трансформируем вершины
+        for vertex in mesh.vertices:
+            world = model @ vertex.to_vector4()
+            world_vertices.append(world.xyz())
+
+            clip = mvp @ vertex.to_vector4()
+            ndc = clip.perspective_divide()
+            projected_vertices.append(self.to_screen(ndc))
+
+    # Рисуем только видимые треугольники
+        for i0, i1, i2 in mesh.faces:
+            v0 = world_vertices[i0]
+            v1 = world_vertices[i1]
+            v2 = world_vertices[i2]
+
+            edge1 = v1 - v0
+            edge2 = v2 - v0
+
+            normal = edge1.cross(edge2).normalized()
+
+            to_camera = (camera.position - v0).normalized()
+
+            # Back-face culling
+            if normal.dot(to_camera) > 0:
+                continue
+
+            x1, y1 = projected_vertices[i0]
+            x2, y2 = projected_vertices[i1]
+            x3, y3 = projected_vertices[i2]
+
+            self.draw_line(x1, y1, x2, y2)
+            self.draw_line(x2, y2, x3, y3)
+            self.draw_line(x3, y3, x1, y1)
+
+                        
 
 
     def draw_line(

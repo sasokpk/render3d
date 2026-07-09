@@ -32,11 +32,11 @@ while True:
     y = 1.0 * math.sin(angle * 0.7)
 
     model = (
-        Matrix4.translation(x, y, 0.0)
-        @ Matrix4.rotation_z(angle)
+        Matrix4.rotation_z(angle)
         @ Matrix4.rotation_y(angle)
         @ Matrix4.rotation_x(angle)
         @ Matrix4.uniform_scale(scale)
+
 
     )
 
