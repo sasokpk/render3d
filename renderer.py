@@ -40,7 +40,6 @@ class Renderer:
             ndc = clip.perspective_divide()
             projected_vertices.append(self.to_screen(ndc))
 
-    # Рисуем только видимые треугольники
         for i0, i1, i2 in mesh.faces:
             v0 = world_vertices[i0]
             v1 = world_vertices[i1]
@@ -61,12 +60,16 @@ class Renderer:
             x2, y2 = projected_vertices[i1]
             x3, y3 = projected_vertices[i2]
 
-            self.draw_line(x1, y1, x2, y2)
-            self.draw_line(x2, y2, x3, y3)
-            self.draw_line(x3, y3, x1, y1)
+            self.draw_triangle(x1, y1, x2, y2, x3, y3)
 
                         
-
+    def draw_point(self, x: int, y: int, point_char: str = "*") -> None:
+        if 0 <= x < self.width and 0 <= y < self.height:
+            self.screen[y][x] = point_char
+    @staticmethod
+    def edge_function(x:int, y:int, x1: int, y1: int, x2: int, y2: int) -> int:
+        return (x2 - x1) * (y - y1) - (y2 - y1) * (x - x1)
+        
 
     def draw_line(
         self,
@@ -99,6 +102,23 @@ class Renderer:
             if e2 < dx:
                 err += dx
                 y1 += sy
+    
+    def draw_triangle(
+        self,
+        x1: int,
+        y1: int,
+        x2: int,
+        y2: int,
+        x3: int,
+        y3: int,
+    ) -> None:
+        self.draw_line(x1, y1, x2, y2)
+        self.draw_line(x2, y2, x3, y3)
+        self.draw_line(x3, y3, x1, y1)
+        for x in range(len(self.screen[0])):
+            for y in range(len(self.screen)):
+                if self.edge_function(x, y, x1, y1, x2, y2) > 0 and self.edge_function(x, y, x2, y2, x3, y3) > 0 and self.edge_function(x, y, x3, y3, x1, y1) > 0:
+                    self.draw_point(x, y, '.')
 
     def to_screen(
         self,
